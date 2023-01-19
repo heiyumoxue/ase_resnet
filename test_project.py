@@ -1,32 +1,15 @@
-import matplotlib.pyplot as plt
-import pandas as pd
 import torch
-import torchvision
-import torchvision.models as models
-import os
-import numpy as np
-from torch import nn
-from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
-from torchvision import transforms
-from tqdm import tqdm
-from net import *
-from PIL import Image
-
-
 import torch.nn.functional as F
 import torch.nn as nn
-from util import get_transform
 
-
-
+import torchvision
 
 import unittest
 from PIL import Image
-import pytorch
 from torch.utils.data import DataLoader
 
-from util import get_transform
+from util import get_transform, get_acc
+from net import get_resnet18
 
 
 IMG_PATH = "dataset/test/Albedo/106.png"
@@ -41,14 +24,24 @@ class TestProject(unittest.TestCase):
         self.assertEqual(transformed_img.shape[1], 224)
         self.assertEqual(transformed_img.shape[2], 224)
         
-        
     def test_acc(self):
-        img = Image.open(IMG_PATH)
+        test_path = r'dataset/test'
+        model_path = r'model_save/resnet18.pth'
+
+        # Loading data
         test_dataset = torchvision.datasets.ImageFolder (root=test_path, transform=get_transform())
         test_loader = DataLoader (dataset=test_dataset, batch_size=32, shuffle=True)
-        self.assertEqual(transformed_img.shape[0], 3)
-        self.assertEqual(transformed_img.shape[1], 224)
-        self.assertEqual(transformed_img.shape[2], 224)
+        loss_fn = nn.CrossEntropyLoss ()
+
+        # load Model
+        model = get_resnet18()
+        model.load_state_dict (torch.load(model_path))
+
+        # get accuracy
+        acc = get_acc(model, test_loader, loss_fn)
+        
+        self.assertGreater(acc, 0.7)
+
             
         
         
