@@ -24,6 +24,15 @@ def get_resnet18():
 
     return model
 
+def get_resnet18_1():
+
+    model = ResNet(img_channels=3, num_layers=18, block=BasicBlock, num_classes=3)
+    num_ftrs = model.fc.in_features
+    model.fc = nn.Linear (num_ftrs, 5)
+
+    return model
+
+
 if __name__ == '__main__':
     print (get_resnet ())
 
